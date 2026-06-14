@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Partner Dashboard — Fixora</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F9FAFB;
+      color: #111827;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #E5E7EB;
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+
+    .logo-icon {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      background: linear-gradient(135deg, #2563EB, #7C3AED);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+
+    .logo-icon svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .logo-text {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #2563EB, #7C3AED);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.3rem 0.875rem;
+      border-radius: 9999px;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #065F46;
+    }
+
+    .nav-badge svg {
+      width: 0.875rem;
+      height: 0.875rem;
+      stroke: #065F46;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .nav-logout {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.35rem 0.875rem;
+      border-radius: 0.5rem;
+      border: 1px solid #E5E7EB;
+      background: #fff;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #6B7280;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .nav-logout:hover { border-color: #FCA5A5; color: #EF4444; }
+
+    .nav-logout svg {
+      width: 0.875rem;
+      height: 0.875rem;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── Page Wrapper ── */
+    .page-wrapper {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .page-title-group h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+
+    .page-title-group p {
+      font-size: 0.875rem;
+      color: #6B7280;
+    }
+
+    /* ── Stats Strip ── */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 0.875rem;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+    }
+
+    .stat-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.625rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stat-icon svg {
+      width: 1.2rem;
+      height: 1.2rem;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .stat-icon.green  { background: #D1FAE5; }
+    .stat-icon.green svg  { stroke: #059669; }
+    .stat-icon.amber  { background: #FEF3C7; }
+    .stat-icon.amber svg  { stroke: #D97706; }
+    .stat-icon.blue   { background: #EFF6FF; }
+    .stat-icon.blue svg   { stroke: #2563EB; }
+    .stat-icon.violet { background: #EDE9FE; }
+    .stat-icon.violet svg { stroke: #7C3AED; }
+
+    .stat-label { font-size: 0.72rem; color: #6B7280; margin-bottom: 0.15rem; }
+    .stat-value { font-size: 1.2rem; font-weight: 700; color: #111827; }
+
+    /* ── Table Card ── */
+    .table-card {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .table-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #F3F4F6;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .table-card-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .table-card-header h2 svg {
+      width: 1rem;
+      height: 1rem;
+      stroke: #059669;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .booking-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.375rem;
+      height: 1.375rem;
+      border-radius: 9999px;
+      background: #D1FAE5;
+      color: #065F46;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0 0.4rem;
+    }
+
+    /* ── Table ── */
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      min-width: 640px;
+    }
+
+    thead tr {
+      background: #F9FAFB;
+      border-bottom: 1px solid #E5E7EB;
+    }
+
+    thead th {
+      padding: 0.75rem 1.5rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #F3F4F6;
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #FAFAFA; }
+
+    tbody td {
+      padding: 1rem 1.5rem;
+      color: #374151;
+      vertical-align: middle;
+    }
+
+    /* Customer cell */
+    .customer-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .customer-avatar {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #A7F3D0, #6EE7B7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #065F46;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .customer-name {
+      font-weight: 600;
+      color: #111827;
+      font-size: 0.875rem;
+    }
+
+    /* Service badge */
+    .service-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 1px solid #BFDBFE;
+      white-space: nowrap;
+    }
+
+    /* Date cell */
+    .date-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.875rem;
+      color: #374151;
+      font-weight: 500;
+    }
+
+    .date-cell svg {
+      width: 0.875rem;
+      height: 0.875rem;
+      stroke: #9CA3AF;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* ── Status Pills ── */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status-pill .dot {
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-pending     { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+    .status-pending .dot    { background: #D97706; }
+    .status-confirmed   { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+    .status-confirmed .dot  { background: #2563EB; }
+    .status-in-progress { background: #FDF4FF; color: #6B21A8; border: 1px solid #E9D5FF; }
+    .status-in-progress .dot { background: #9333EA; }
+    .status-completed   { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+    .status-completed .dot  { background: #059669; }
+    .status-cancelled   { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+    .status-cancelled .dot  { background: #DC2626; }
+    .status-default     { background: #F3F4F6; color: #374151; border: 1px solid #E5E7EB; }
+    .status-default .dot    { background: #9CA3AF; }
+
+    /* ── Action Buttons ── */
+    .action-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.4rem 0.875rem;
+      border-radius: 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover  { opacity: 0.88; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn svg {
+      width: 0.875rem;
+      height: 0.875rem;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Accept */
+    .btn-accept {
+      background: #D1FAE5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+    }
+    .btn-accept svg { stroke: #065F46; }
+    .btn-accept:hover { background: #A7F3D0; }
+
+    /* Reject */
+    .btn-reject {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FECACA;
+    }
+    .btn-reject svg { stroke: #991B1B; }
+    .btn-reject:hover { background: #FECACA; }
+
+    /* Start Work */
+    .btn-start {
+      background: #EDE9FE;
+      color: #5B21B6;
+      border: 1px solid #C4B5FD;
+    }
+    .btn-start svg { stroke: #5B21B6; }
+    .btn-start:hover { background: #C4B5FD; }
+
+    /* Complete */
+    .btn-complete {
+      background: linear-gradient(135deg, #059669, #10B981);
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+    .btn-complete svg { stroke: #fff; }
+
+    /* ── Empty State ── */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      background: #F3F4F6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+
+    .empty-icon svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      stroke: #9CA3AF;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .empty-state h3 { font-size: 1rem; font-weight: 600; color: #374151; margin-bottom: 0.375rem; }
+    .empty-state p  { font-size: 0.875rem; color: #9CA3AF; }
+
+    /* ── Footer ── */
+    footer {
+      background: #fff;
+      border-top: 1px solid #E5E7EB;
+      padding: 1.125rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .footer-copy { font-size: 0.8125rem; color: #9CA3AF; }
+    .footer-socials { display: flex; gap: 1rem; }
+
+    .footer-socials svg {
+      width: 1.125rem;
+      height: 1.125rem;
+      stroke: #9CA3AF;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      cursor: pointer;
+      transition: stroke 0.2s;
+    }
+
+    .footer-socials svg:hover { stroke: #10B981; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .navbar { padding: 0.875rem 1rem; }
+      .page-wrapper { padding: 1.5rem 1rem; }
+      .page-header { flex-direction: column; }
+      footer { padding: 1rem; justify-content: center; text-align: center; }
+      .nav-badge { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navbar ── -->
+  <nav class="navbar">
+    <a class="logo" href="/">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+      </div>
+      <span class="logo-text">Fixora</span>
+    </a>
+
+    <div class="nav-right">
+      <div class="nav-badge">
+        <!-- Briefcase icon -->
+        <svg viewBox="0 0 24 24">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        </svg>
+        Partner Portal
+      </div>
+      <a class="nav-logout" href="/partner/logout">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Logout
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Page Content ── -->
+  <div class="page-wrapper">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-title-group">
+        <h1>Partner Dashboard</h1>
+        <p>Manage incoming booking requests and track your active jobs.</p>
+      </div>
+    </div>
+
+    <!-- Stats Strip -->
+    <div class="stats-strip">
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <svg viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <div>
+          <p class="stat-label">Total Bookings</p>
+          <p class="stat-value" th:text="${#lists.size(bookings)}">0</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div>
+          <p class="stat-label">Pending</p>
+          <p class="stat-value">—</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon violet">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div>
+          <p class="stat-label">In Progress</p>
+          <p class="stat-value">—</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <svg viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div>
+          <p class="stat-label">Completed</p>
+          <p class="stat-value">—</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+      <div class="table-card-header">
+        <h2>
+          <svg viewBox="0 0 24 24">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+          Booking Requests
+          <span class="booking-count" th:text="${#lists.size(bookings)}">0</span>
+        </h2>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Service</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- ── Thymeleaf loop — all th: attributes preserved exactly ── -->
+            <tr th:each="booking : ${bookings}">
+
+              <!-- Customer — th:text preserved exactly -->
+              <td>
+                <div class="customer-cell">
+                  <div class="customer-avatar" th:text="${#strings.substring(booking.customerName, 0, 1)}">?</div>
+                  <span class="customer-name" th:text="${booking.customerName}">Customer</span>
+                </div>
+              </td>
+
+              <!-- Service Type — th:text preserved exactly -->
+              <td>
+                <span class="service-badge" th:text="${booking.serviceType}">Service</span>
+              </td>
+
+              <!-- Booking Date — th:text preserved exactly -->
+              <td>
+                <div class="date-cell">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  <span th:text="${booking.bookingDate}">Date</span>
+                </div>
+              </td>
+
+              <!-- Status — th:text preserved exactly, colour pill via th:classappend -->
+              <td>
+                <span class="status-pill"
+                  th:classappend="${booking.status == 'PENDING'}     ? 'status-pending'     :
+                                  (${booking.status == 'CONFIRMED'}   ? 'status-confirmed'   :
+                                  (${booking.status == 'IN_PROGRESS'} ? 'status-in-progress' :
+                                  (${booking.status == 'COMPLETED'}   ? 'status-completed'   :
+                                  (${booking.status == 'CANCELLED'}   ? 'status-cancelled'   : 'status-default'))))">
+                  <span class="dot"></span>
+                  <span th:text="${booking.status}">Status</span>
+                </span>
+              </td>
+
+              <!-- Actions — all th:if conditions and th:href values preserved exactly -->
+              <td>
+                <div class="action-cell">
+
+                  <!-- PENDING: Accept + Reject — th:if & th:href preserved exactly -->
+                  <span th:if="${booking.status == 'PENDING'}">
+                    <a th:href="@{/partner/booking/accept/{id}(id=${booking.id})}" class="btn btn-accept">
+                      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                      Accept
+                    </a>
+                    <a th:href="@{/partner/booking/reject/{id}(id=${booking.id})}" class="btn btn-reject" style="margin-left:0.4rem;">
+                      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      Reject
+                    </a>
+                  </span>
+
+                  <!-- CONFIRMED: Start Work — th:if & th:href preserved exactly -->
+                  <span th:if="${booking.status == 'CONFIRMED'}">
+                    <a th:href="@{/partner/booking/start/{id}(id=${booking.id})}" class="btn btn-start">
+                      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      Start Work
+                    </a>
+                  </span>
+
+                  <!-- IN_PROGRESS: Complete — th:if & th:href preserved exactly -->
+                  <span th:if="${booking.status == 'IN_PROGRESS'}">
+                    <a th:href="@{/partner/booking/complete/{id}(id=${booking.id})}" class="btn btn-complete">
+                      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      Complete
+                    </a>
+                  </span>
+
+                </div>
+              </td>
+
+            </tr>
+            <!-- ── End Thymeleaf loop ── -->
+
+            <!-- Empty state row when no bookings -->
+            <tr th:if="${#lists.isEmpty(bookings)}">
+              <td colspan="5">
+                <div class="empty-state">
+                  <div class="empty-icon">
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="12"/>
+                      <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                  </div>
+                  <h3>No booking requests yet</h3>
+                  <p>New requests from customers will appear here.</p>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end .page-wrapper -->
+
+  <!-- ── Footer ── -->
+  <footer>
+    <span class="footer-copy">© <script>document.write(new Date().getFullYear())</script> Fixora Inc. All rights reserved.</span>
+    <div class="footer-socials">
+      <svg viewBox="0 0 24 24" title="Facebook">
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+      </svg>
+      <svg viewBox="0 0 24 24" title="Twitter">
+        <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+      </svg>
+      <svg viewBox="0 0 24 24" title="Instagram">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+      </svg>
+    </div>
+  </footer>
+
+</body>
+</html>

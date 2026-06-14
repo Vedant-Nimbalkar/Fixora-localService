@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Dashboard — Fixora</title>
+<link
+	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+	rel="stylesheet" />
+<style>
+/* ── Reset ── */
+*, *::before, *::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	background: #F9FAFB;
+	color: #111827;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	-webkit-font-smoothing: antialiased;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+button {
+	cursor: pointer;
+	border: none;
+	background: none;
+	font-family: inherit;
+}
+
+/* ── Navbar ── */
+.navbar {
+	background: rgba(255, 255, 255, 0.92);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border-bottom: 1px solid #E5E7EB;
+	padding: 0.9rem 2rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	position: sticky;
+	top: 0;
+	z-index: 50;
+}
+
+.logo {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+}
+
+.logo-icon {
+	width: 2rem;
+	height: 2rem;
+	border-radius: 0.5rem;
+	background: linear-gradient(135deg, #2563EB, #7C3AED);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+
+.logo-icon svg {
+	width: 1.1rem;
+	height: 1.1rem;
+	stroke: #fff;
+	fill: none;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.logo-text {
+	font-size: 1.4rem;
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	background: linear-gradient(to right, #2563EB, #7C3AED);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.nav-right {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.nav-badge {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.3rem 0.875rem;
+	border-radius: 9999px;
+	background: #EDE9FE;
+	border: 1px solid #C4B5FD;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: #6D28D9;
+}
+
+.nav-badge svg {
+	width: 0.875rem;
+	height: 0.875rem;
+	stroke: #6D28D9;
+	fill: none;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.nav-logout {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.35rem 0.875rem;
+	border-radius: 0.5rem;
+	border: 1px solid #E5E7EB;
+	background: #fff;
+	font-size: 0.8rem;
+	font-weight: 500;
+	color: #6B7280;
+	cursor: pointer;
+	transition: border-color 0.2s, color 0.2s;
+}
+
+.nav-logout:hover {
+	border-color: #EF4444;
+	color: #EF4444;
+}
+
+.nav-logout svg {
+	width: 0.875rem;
+	height: 0.875rem;
+	stroke: currentColor;
+	fill: none;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* ── Page Layout ── */
+.page-wrapper {
+	flex: 1;
+	padding: 2.5rem 2rem;
+	max-width: 1200px;
+	width: 100%;
+	margin: 0 auto;
+}
+
+/* ── Page Header ── */
+.page-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin-bottom: 2rem;
+}
+
+.page-title-group {
+	
+}
+
+.page-title-group h1 {
+	font-size: 1.6rem;
+	font-weight: 800;
+	color: #111827;
+	letter-spacing: -0.02em;
+	margin-bottom: 0.25rem;
+}
+
+.page-title-group p {
+	font-size: 0.875rem;
+	color: #6B7280;
+}
+
+/* ── Stats Strip ── */
+.stats-strip {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 1rem;
+	margin-bottom: 2rem;
+}
+
+.stat-card {
+	background: #fff;
+	border: 1px solid #E5E7EB;
+	border-radius: 0.875rem;
+	padding: 1rem 1.25rem;
+	display: flex;
+	align-items: center;
+	gap: 0.875rem;
+}
+
+.stat-icon {
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 0.625rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.stat-icon svg {
+	width: 1.2rem;
+	height: 1.2rem;
+	fill: none;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.stat-icon.violet {
+	background: #EDE9FE;
+}
+
+.stat-icon.violet svg {
+	stroke: #7C3AED;
+}
+
+.stat-icon.amber {
+	background: #FEF3C7;
+}
+
+.stat-icon.amber svg {
+	stroke: #D97706;
+}
+
+.stat-icon.green {
+	background: #D1FAE5;
+}
+
+.stat-icon.green svg {
+	stroke: #059669;
+}
+
+.stat-icon.red {
+	background: #FEE2E2;
+}
+
+.stat-icon.red svg {
+	stroke: #DC2626;
+}
+
+.stat-info {
+	
+}
+
+.stat-label {
+	font-size: 0.75rem;
+	color: #6B7280;
+	margin-bottom: 0.2rem;
+}
+
+.stat-value {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #111827;
+}
+
+/* ── Table Card ── */
+.table-card {
+	background: #fff;
+	border: 1px solid #E5E7EB;
+	border-radius: 1rem;
+	overflow: hidden;
+	box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+}
+
+.table-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1.25rem 1.5rem;
+	border-bottom: 1px solid #F3F4F6;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+}
+
+.table-card-header h2 {
+	font-size: 1rem;
+	font-weight: 700;
+	color: #111827;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.table-card-header h2 svg {
+	width: 1rem;
+	height: 1rem;
+	stroke: #7C3AED;
+	fill: none;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.pending-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.375rem;
+	height: 1.375rem;
+	border-radius: 9999px;
+	background: #EDE9FE;
+	color: #6D28D9;
+	font-size: 0.7rem;
+	font-weight: 700;
+	padding: 0 0.4rem;
+}
+
+/* ── Table ── */
+.table-scroll {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.875rem;
+	min-width: 560px;
+}
+
+thead tr {
+	background: #F9FAFB;
+	border-bottom: 1px solid #E5E7EB;
+}
+
+thead th {
+	padding: 0.75rem 1.5rem;
+	text-align: left;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: #6B7280;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	white-space: nowrap;
+}
+
+tbody tr {
+	border-bottom: 1px solid #F3F4F6;
+	transition: background 0.15s;
+}
+
+tbody tr:last-child {
+	border-bottom: none;
+}
+
+tbody tr:hover {
+	background: #FAFAFA;
+}
+
+tbody td {
+	padding: 1rem 1.5rem;
+	color: #374151;
+	vertical-align: middle;
+}
+
+/* Name cell */
+.td-name {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.avatar {
+	width: 2.25rem;
+	height: 2.25rem;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #C4B5FD, #818CF8);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.8rem;
+	font-weight: 700;
+	color: #fff;
+	flex-shrink: 0;
+	text-transform: uppercase;
+}
+
+.td-name-text strong {
+	display: block;
+	font-weight: 600;
+	color: #111827;
+	font-size: 0.875rem;
+}
+
+.td-name-text span {
+	font-size: 0.75rem;
+	color: #9CA3AF;
+}
+
+/* Service badge */
+.service-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.25rem 0.75rem;
+	border-radius: 9999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	background: #EFF6FF;
+	color: #1D4ED8;
+	border: 1px solid #BFDBFE;
+	white-space: nowrap;
+}
+
+/* Experience */
+.exp-text {
+	font-size: 0.875rem;
+	color: #374151;
+	font-weight: 500;
+}
+
+/* Action buttons */
+.action-cell {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.4rem 0.875rem;
+	border-radius: 0.5rem;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	font-family: inherit;
+	cursor: pointer;
+	transition: opacity 0.2s, transform 0.15s;
+	white-space: nowrap;
+}
+
+.btn:hover {
+	opacity: 0.88;
+	transform: translateY(-1px);
+}
+
+.btn:active {
+	transform: translateY(0);
+}
+
+.btn svg {
+	width: 0.875rem;
+	height: 0.875rem;
+	fill: none;
+	stroke-width: 2.5;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* Approve */
+.btn-approve {
+	background: #D1FAE5;
+	color: #065F46;
+	border: 1px solid #A7F3D0;
+}
+
+.btn-approve svg {
+	stroke: #065F46;
+}
+
+.btn-approve:hover {
+	background: #A7F3D0;
+}
+
+/* Reject */
+.btn-reject {
+	background: #FEE2E2;
+	color: #991B1B;
+	border: 1px solid #FECACA;
+}
+
+.btn-reject svg {
+	stroke: #991B1B;
+}
+
+.btn-reject:hover {
+	background: #FECACA;
+}
+
+/* ── Empty State ── */
+.empty-state {
+	text-align: center;
+	padding: 4rem 2rem;
+}
+
+.empty-icon {
+	width: 3.5rem;
+	height: 3.5rem;
+	border-radius: 50%;
+	background: #F3F4F6;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0 auto 1rem;
+}
+
+.empty-icon svg {
+	width: 1.5rem;
+	height: 1.5rem;
+	stroke: #9CA3AF;
+	fill: none;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.empty-state h3 {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #374151;
+	margin-bottom: 0.375rem;
+}
+
+.empty-state p {
+	font-size: 0.875rem;
+	color: #9CA3AF;
+}
+
+/* ── Footer ── */
+footer {
+	background: #fff;
+	border-top: 1px solid #E5E7EB;
+	padding: 1.125rem 2rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+}
+
+.footer-copy {
+	font-size: 0.8125rem;
+	color: #9CA3AF;
+}
+
+.footer-socials {
+	display: flex;
+	gap: 1rem;
+}
+
+.footer-socials svg {
+	width: 1.125rem;
+	height: 1.125rem;
+	stroke: #9CA3AF;
+	fill: none;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	cursor: pointer;
+	transition: stroke 0.2s;
+}
+
+.footer-socials svg:hover {
+	stroke: #7C3AED;
+}
+
+/* ── Responsive ── */
+@media ( max-width : 640px) {
+	.navbar {
+		padding: 0.875rem 1rem;
+	}
+	.page-wrapper {
+		padding: 1.5rem 1rem;
+	}
+	.page-header {
+		flex-direction: column;
+	}
+	footer {
+		padding: 1rem;
+		justify-content: center;
+		text-align: center;
+	}
+	.nav-logout span {
+		display: none;
+	}
+}
+</style>
+</head>
+<body>
+
+	<!-- ── Navbar ── -->
+	<nav class="navbar">
+		<a class="logo" href="/">
+			<div class="logo-icon">
+				<!-- Wrench icon -->
+				<svg viewBox="0 0 24 24">
+          <path
+						d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+        </svg>
+			</div> <span class="logo-text">Fixora</span>
+		</a>
+
+		<div class="nav-right">
+			<div class="nav-badge">
+				<!-- Shield icon -->
+				<svg viewBox="0 0 24 24">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+				Admin Portal
+			</div>
+			<a class="nav-logout" href="/admin/logout"> <!-- Logout icon -->
+				<svg viewBox="0 0 24 24">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg> <span>Logout</span>
+			</a>
+		</div>
+	</nav>
+
+	<!-- ── Page Content ── -->
+	<div class="page-wrapper">
+
+		<!-- Page Header -->
+		<div class="page-header">
+			<div class="page-title-group">
+				<h1>Admin Dashboard</h1>
+				<p>Manage and review incoming partner requests below.</p>
+			</div>
+		</div>
+
+		<!-- Stats Strip -->
+		<div class="stats-strip">
+			<div class="stat-card">
+				<div class="stat-icon violet">
+					<svg viewBox="0 0 24 24">
+						<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+						<circle cx="9" cy="7" r="4" />
+						<path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+						<path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+				</div>
+				<div class="stat-info">
+					<p class="stat-label">Total Requests</p>
+					<p class="stat-value">—</p>
+				</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-icon amber">
+					<svg viewBox="0 0 24 24">
+						<circle cx="12" cy="12" r="10" />
+						<polyline points="12 6 12 12 16 14" /></svg>
+				</div>
+				<div class="stat-info">
+					<p class="stat-label">Pending</p>
+					<p class="stat-value">—</p>
+				</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-icon green">
+					<svg viewBox="0 0 24 24">
+						<polyline points="20 6 9 17 4 12" /></svg>
+				</div>
+				<div class="stat-info">
+					<p class="stat-label">Approved</p>
+					<p class="stat-value">—</p>
+				</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-icon red">
+					<svg viewBox="0 0 24 24">
+						<line x1="18" y1="6" x2="6" y2="18" />
+						<line x1="6" y1="6" x2="18" y2="18" /></svg>
+				</div>
+				<div class="stat-info">
+					<p class="stat-label">Rejected</p>
+					<p class="stat-value">—</p>
+				</div>
+			</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-icon red">
+				<svg viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+			</div>
+			<div class="stat-info">
+				<p class="stat-label">Complaints</p>
+				<p class="stat-value" th:text="${#lists.size(complaints)}">—</p>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon violet">
+				<svg viewBox="0 0 24 24">
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
+			</div>
+			<div class="stat-info">
+				<p class="stat-label">Service Requests</p>
+				<p class="stat-value" th:text="${#lists.size(serviceRequests)}">—</p>
+			</div>
+		</div>
+
+		<!-- Table Card -->
+		<div class="table-card">
+			<div class="table-card-header">
+				<h2>
+					<!-- List icon -->
+					<svg viewBox="0 0 24 24">
+            <line x1="8" y1="6" x2="21" y2="6" />
+						<line x1="8" y1="12" x2="21" y2="12" />
+            <line x1="8" y1="18" x2="21" y2="18" />
+						<line x1="3" y1="6" x2="3.01" y2="6" />
+            <line x1="3" y1="12" x2="3.01" y2="12" />
+						<line x1="3" y1="18" x2="3.01" y2="18" />
+          </svg>
+					Pending Partner Requests <span class="pending-count"
+						th:text="${#lists.size(requests)}">0</span>
+				</h2>
+			</div>
+
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>Partner</th>
+							<th>Service</th>
+							<th>Experience</th>
+							<th>Actions</th>
+							<th>Documents</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						<!-- ── Thymeleaf loop — all th: attributes preserved exactly ── -->
+						<tr th:each="req : ${requests}">
+
+							<!-- Name with avatar initials -->
+							<td>
+								<div class="td-name">
+									<div class="avatar"
+										th:text="${#strings.substring(req.name, 0, 1)}">?</div>
+									<div class="td-name-text">
+										<strong th:text="${req.name}">Partner Name</strong> <span>Partner</span>
+									</div>
+								</div>
+							</td>
+
+							<!-- Service type badge -->
+							<td><span class="service-badge" th:text="${req.serviceType}">Service</span>
+							</td>
+
+							<!-- Experience -->
+							<td><span class="exp-text" th:text="${req.experience}">Experience</span>
+							</td>
+
+							<!-- Action buttons — th:href preserved exactly -->
+							<td>
+								<div class="action-cell">
+									<a class="btn btn-approve"
+										th:href="@{/admin/approve/{id}(id=${req.id})}"> <!-- Check icon -->
+										<svg viewBox="0 0 24 24">
+											<polyline points="20 6 9 17 4 12" /></svg> Approve
+									</a> <a class="btn btn-reject"
+										th:href="@{/admin/reject/{id}(id=${req.id})}"> <!-- X icon -->
+										<svg viewBox="0 0 24 24">
+											<line x1="18" y1="6" x2="6" y2="18" />
+											<line x1="6" y1="6" x2="18" y2="18" /></svg> Reject
+									</a>
+								</div>
+							</td>
+							<td>
+								<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+
+									<!-- Aadhaar -->
+									<a th:if="${req.aadhaarPath != null}"
+										th:href="${req.aadhaarPath}" target="_blank"
+										style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.625rem; border-radius: 0.375rem; background: #EFF6FF; color: #1D4ED8; font-size: 0.75rem; font-weight: 600; border: 1px solid #BFDBFE; text-decoration: none;">
+										📄 Aadhaar </a> <span th:if="${req.aadhaarPath == null}"
+										style="font-size: 0.75rem; color: #9CA3AF;">No Aadhaar</span>
+
+									<!-- PAN -->
+									<a th:if="${req.panPath != null}" th:href="${req.panPath}"
+										target="_blank"
+										style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.625rem; border-radius: 0.375rem; background: #F0FDF4; color: #15803D; font-size: 0.75rem; font-weight: 600; border: 1px solid #BBF7D0; text-decoration: none;">
+										📄 PAN </a> <span th:if="${req.panPath == null}"
+										style="font-size: 0.75rem; color: #9CA3AF;">No PAN</span>
+
+									<!-- Photo -->
+									<a th:if="${req.photoPath != null}" th:href="${req.photoPath}"
+										target="_blank"
+										style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.625rem; border-radius: 0.375rem; background: #FDF4FF; color: #7E22CE; font-size: 0.75rem; font-weight: 600; border: 1px solid #E9D5FF; text-decoration: none;">
+										🖼️ Photo </a> <span th:if="${req.photoPath == null}"
+										style="font-size: 0.75rem; color: #9CA3AF;">No Photo</span>
+
+								</div>
+							</td>
+						</tr>
+						<!-- ── End Thymeleaf loop ── -->
+
+						<!-- Empty state row (shown only when no requests exist) -->
+						<tr th:if="${#lists.isEmpty(requests)}">
+							<td colspan="4">
+								<div class="empty-state">
+									<div class="empty-icon">
+										<svg viewBox="0 0 24 24">
+											<circle cx="12" cy="12" r="10" />
+											<line x1="12" y1="8" x2="12" y2="12" />
+											<line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+									</div>
+									<h3>No pending requests</h3>
+									<p>All partner requests have been reviewed.</p>
+								</div>
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<!-- ── Registered Service Providers Table ── -->
+		<div class="table-card" style="margin-top: 2rem;">
+			<div class="table-card-header">
+				<h2>
+					<svg viewBox="0 0 24 24">
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+					Registered Service Providers <span class="pending-count"
+						style="background: #D1FAE5; color: #065F46;"
+						th:text="${#lists.size(partners)}">0</span>
+				</h2>
+			</div>
+
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>Partner</th>
+							<th>Email</th>
+							<th>Phone</th>
+							<th>Service</th>
+							<th>Experience</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						<tr th:each="partner : ${partners}">
+
+							<!-- Name with avatar -->
+							<td>
+								<div class="td-name">
+									<div class="avatar"
+										style="background: linear-gradient(135deg, #6EE7B7, #059669);"
+										th:text="${#strings.substring(partner.name, 0, 1)}">?</div>
+									<div class="td-name-text">
+										<strong th:text="${partner.name}">Partner Name</strong> <span>Registered</span>
+									</div>
+								</div>
+							</td>
+
+							<!-- Email -->
+							<td th:text="${partner.email}">email@example.com</td>
+
+							<!-- Phone -->
+							<td th:text="${partner.phone}">0000000000</td>
+
+							<!-- Service badge -->
+							<td><span class="service-badge"
+								style="background: #D1FAE5; color: #065F46; border-color: #A7F3D0;"
+								th:text="${partner.serviceType}">Service</span></td>
+
+							<!-- Experience -->
+							<td><span class="exp-text"
+								th:text="${partner.experience} + ' yrs'">0 yrs</span></td>
+
+						</tr>
+
+						<!-- Empty state -->
+						<tr th:if="${#lists.isEmpty(partners)}">
+							<td colspan="5">
+								<div class="empty-state">
+									<div class="empty-icon">
+										<svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+									</div>
+									<h3>No registered providers yet</h3>
+									<p>Approved partners will appear here.</p>
+								</div>
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<!-- ── Complaints Table ── -->
+		<div class="table-card" style="margin-top: 2rem;">
+			<div class="table-card-header">
+				<h2>
+					<svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+					Complaints <span class="pending-count"
+						style="background: #FEE2E2; color: #991B1B;"
+						th:text="${#lists.size(complaints)}">0</span>
+				</h2>
+			</div>
+
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>User</th>
+							<th>Provider</th>
+							<th>Service</th>
+							<th>Subject</th>
+							<th>Description</th>
+							<th>Status</th>
+							<th>Date</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="complaint : ${complaints}">
+							<td>
+								<div class="td-name">
+									<div class="avatar"
+										style="background: linear-gradient(135deg, #FCA5A5, #EF4444);"
+										th:text="${#strings.substring(complaint.userName, 0, 1)}">?</div>
+									<div class="td-name-text">
+										<strong th:text="${complaint.userName}">User</strong> <span
+											th:text="${complaint.userEmail}">email</span>
+									</div>
+								</div>
+							</td>
+							<td th:text="${complaint.partnerName}">Provider</td>
+							<td><span class="service-badge"
+								style="background: #FEE2E2; color: #991B1B; border-color: #FECACA;"
+								th:text="${complaint.serviceType}">Service</span></td>
+							<td th:text="${complaint.subject}">Subject</td>
+							<td><span
+								th:text="${#strings.abbreviate(complaint.description, 50)}">
+									Description... </span></td>
+							<td><span th:text="${complaint.status}"
+								th:class="${complaint.status == 'RESOLVED'} ? 'service-badge' : 'pending-count'"
+								style="padding: 0.25rem 0.75rem;"> OPEN </span></td>
+							<td><span
+								th:text="${complaint.createdAt != null} ? ${#temporals.format(complaint.createdAt, 'dd-MM-yyyy')} : '-'">
+									Date </span></td>
+							<td><a th:if="${complaint.status != 'RESOLVED'}"
+								class="btn btn-approve"
+								th:href="@{/admin/complaint/{id}/resolve(id=${complaint.id})}">
+									<svg viewBox="0 0 24 24">
+									<polyline points="20 6 9 17 4 12" /></svg> Resolve
+							</a> <span th:if="${complaint.status == 'RESOLVED'}"
+								style="color: #059669; font-size: 0.8rem; font-weight: 600;">
+									✓ Resolved </span></td>
+						</tr>
+
+						<tr th:if="${#lists.isEmpty(complaints)}">
+							<td colspan="8">
+								<div class="empty-state">
+									<div class="empty-icon">
+										<svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+									</div>
+									<h3>No complaints yet</h3>
+									<p>All is well — no complaints from users.</p>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- ── Service Requests Table ── -->
+		<div class="table-card" style="margin-top: 2rem;">
+			<div class="table-card-header">
+				<h2>
+					<svg viewBox="0 0 24 24">
+        <line x1="22" y1="2" x2="11" y2="13" />
+        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+      </svg>
+					Service Requests <span class="pending-count"
+						style="background: #EDE9FE; color: #6D28D9;"
+						th:text="${#lists.size(serviceRequests)}">0</span>
+				</h2>
+			</div>
+
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>User</th>
+							<th>Service Needed</th>
+							<th>Location</th>
+							<th>Description</th>
+							<th>Status</th>
+							<th>Date</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="req : ${serviceRequests}">
+							<td>
+								<div class="td-name">
+									<div class="avatar"
+										style="background: linear-gradient(135deg, #C4B5FD, #7C3AED);"
+										th:text="${#strings.substring(req.userName, 0, 1)}">?</div>
+									<div class="td-name-text">
+										<strong th:text="${req.userName}">User</strong> <span
+											th:text="${req.userEmail}">email</span>
+									</div>
+								</div>
+							</td>
+							<td><span class="service-badge" th:text="${req.serviceType}">Service</span>
+							</td>
+							<td th:text="${req.location}">Location</td>
+							<td><span
+								th:text="${#strings.abbreviate(req.description, 50)}">
+									Description... </span></td>
+							<td><span th:text="${req.status}">PENDING</span></td>
+							<td><span
+								th:text="${req.createdAt != null} ? ${#temporals.format(req.createdAt, 'dd-MM-yyyy')} : '-'">
+									Date </span></td>
+							<td><a th:if="${req.status != 'FULFILLED'}"
+								class="btn btn-approve"
+								th:href="@{/admin/service-request/{id}/fulfil(id=${req.id})}">
+									<svg viewBox="0 0 24 24">
+									<polyline points="20 6 9 17 4 12" /></svg> Mark Fulfilled
+							</a> <span th:if="${req.status == 'FULFILLED'}"
+								style="color: #059669; font-size: 0.8rem; font-weight: 600;">
+									✓ Fulfilled </span></td>
+						</tr>
+
+						<tr th:if="${#lists.isEmpty(serviceRequests)}">
+							<td colspan="7">
+								<div class="empty-state">
+									<div class="empty-icon">
+										<svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+									</div>
+									<h3>No service requests yet</h3>
+									<p>Users haven't requested any new services yet.</p>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- ── Partner Management Table ── -->
+		<div class="table-card" style="margin-top: 2rem;">
+			<div class="table-card-header">
+				<h2>
+					<svg viewBox="0 0 24 24">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+					Partner Management <span class="pending-count"
+						style="background: #D1FAE5; color: #065F46;"
+						th:text="${#lists.size(partners)}">0</span>
+				</h2>
+			</div>
+
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>Partner</th>
+							<th>Email</th>
+							<th>Phone</th>
+							<th>Service</th>
+							<th>Experience</th>
+							<th>Status</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="partner : ${partners}">
+							<td>
+								<div class="td-name">
+									<div class="avatar"
+										style="background: linear-gradient(135deg, #6EE7B7, #059669);"
+										th:text="${#strings.substring(partner.name, 0, 1)}">?</div>
+									<div class="td-name-text">
+										<strong th:text="${partner.name}">Name</strong> <span>Registered</span>
+									</div>
+								</div>
+							</td>
+							<td th:text="${partner.email}">email</td>
+							<td th:text="${partner.phone}">phone</td>
+							<td><span class="service-badge"
+								style="background: #D1FAE5; color: #065F46; border-color: #A7F3D0;"
+								th:text="${partner.serviceType}">Service</span></td>
+							<td><span class="exp-text"
+								th:text="${partner.experience} + ' yrs'">0 yrs</span></td>
+							<td><span th:if="${!partner.suspended}"
+								style="color: #059669; font-size: 0.8rem; font-weight: 600;">
+									✓ Active </span> <span th:if="${partner.suspended}"
+								style="color: #DC2626; font-size: 0.8rem; font-weight: 600;">
+									✗ Suspended </span></td>
+							<td>
+								<div class="action-cell">
+									<!-- Suspend/Unsuspend -->
+									<a th:if="${!partner.suspended}" class="btn btn-reject"
+										th:href="@{/admin/suspend/{id}(id=${partner.id})}"
+										onclick="return confirm('Suspend this partner?')"> <svg
+											viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                </svg> Suspend
+									</a> <a th:if="${partner.suspended}" class="btn btn-approve"
+										th:href="@{/admin/unsuspend/{id}(id=${partner.id})}"> <svg
+											viewBox="0 0 24 24">
+										<polyline points="20 6 9 17 4 12" /></svg> Unsuspend
+									</a>
+
+									<!-- Delete -->
+									<a class="btn btn-reject"
+										th:href="@{/admin/delete/{id}(id=${partner.id})}"
+										onclick="return confirm('Permanently delete this partner? This cannot be undone.')">
+										<svg viewBox="0 0 24 24">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path
+												d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6" />
+										<path d="M14 11v6" />
+                </svg> Delete
+									</a>
+								</div>
+							</td>
+						</tr>
+
+						<tr th:if="${#lists.isEmpty(partners)}">
+							<td colspan="7">
+								<div class="empty-state">
+									<div class="empty-icon">
+										<svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+									</div>
+									<h3>No partners yet</h3>
+									<p>Approved partners will appear here.</p>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- end .page-wrapper -->
+
+
+	<!-- ── Footer ── -->
+	<footer>
+		<span class="footer-copy">© <script>
+			document.write(new Date().getFullYear())
+		</script> Fixora Inc. All rights reserved.
+		</span>
+		<div class="footer-socials">
+			<!-- Facebook -->
+			<svg viewBox="0 0 24 24" title="Facebook">
+        <path
+					d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+      </svg>
+			<!-- Twitter -->
+			<svg viewBox="0 0 24 24" title="Twitter">
+        <path
+					d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+      </svg>
+			<!-- Instagram -->
+			<svg viewBox="0 0 24 24" title="Instagram">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+      </svg>
+		</div>
+	</footer>
+
+</body>
+</html>
